@@ -4,8 +4,8 @@
 
 ## 功能特性
 
-- 扫描当前页面内联 SVG（支持多帧、所有 iframe，见 `extension/manifest.json`）
-- 支持「尽量还原样式」导出（内联计算样式）或「原始 SVG」两种模式（`extension/popup.html`）
+- 扫描当前页面内联 SVG（支持多帧、所有 iframe，见 `manifest.json`）
+- 支持「尽量还原样式」导出（内联计算样式）或「原始 SVG」两种模式（`popup.html`）
 - 支持设置导出倍率（1–8 倍），支持透明/白底背景
 - 可勾选“仅可见”过滤当前视口内实际可见的 SVG
 - 预览每一个 SVG 的缩略图、尺寸和选择器信息
@@ -15,14 +15,13 @@
 ## 目录结构
 
 ```text
-svg-png/
-  extension/
-    manifest.json      # Chrome 扩展清单
-    popup.html         # 插件弹窗 UI
-    popup.js           # 弹窗逻辑：扫描、预览、批量导出
-    contentScript.js   # 注入页面：构建 SVG 快照，处理样式和导出
-    serviceWorker.js   # 背景脚本：下载权限、右键菜单、图标
-    icon.svg           # 扩展图标
+.
+  manifest.json      # Chrome 扩展清单
+  popup.html         # 弹窗 UI
+  popup.js           # 弹窗逻辑：扫描、预览、批量导出
+  contentScript.js   # 注入页面：构建 SVG 快照，处理样式和导出
+  serviceWorker.js   # 背景脚本：下载权限、右键菜单、图标
+  icon.svg           # 扩展图标
 ```
 
 ## 在浏览器中加载
@@ -32,7 +31,7 @@ svg-png/
 1. 访问 `chrome://extensions`
 2. 打开右上角「开发者模式」
 3. 点击「加载已解压的扩展程序」
-4. 选择本项目目录下的 `svg-png/extension` 目录
+4. 选择本项目目录（包含 `manifest.json` 的文件夹）
 5. 安装后点击工具栏图标打开扩展弹窗
 
 > 若是第一次开发调试，建议勾选「允许在隐身模式运行」方便在不同网站测试。
@@ -57,7 +56,7 @@ svg-png/
 
 ## 权限说明
 
-参考 `extension/manifest.json`：
+参考 `manifest.json`：
 
 - `activeTab`：只在你当前激活的标签页上运行扫描逻辑
 - `scripting`：向页面注入脚本，以便读取内联 SVG 并渲染为图片
@@ -71,10 +70,10 @@ svg-png/
 
 本扩展没有打包流程，所有代码均为原生 JS + 原生 DOM 操作：
 
-- 弹窗入口：`extension/popup.html` + `extension/popup.js`
-- 页面扫描与样式快照：`extension/contentScript.js`
-- PNG 栅格化逻辑：`extension/popup.js:43` 以及 `extension/contentScript.js:301`
-- 下载入口：`extension/serviceWorker.js:85`
+- 弹窗入口：`popup.html` + `popup.js`
+- 页面扫描与样式快照：`contentScript.js`
+- PNG 栅格化逻辑：`popup.js:43` 以及 `contentScript.js:301`
+- 下载入口：`serviceWorker.js:85`
 
 调试建议：
 
@@ -86,4 +85,3 @@ svg-png/
 - 仅用于你有合法权利保存/使用的 SVG 资源
 - 一些复杂 SVG（滤镜、外链字体、跨域图片等）在 Canvas 渲染时可能有差异
 - 在高倍率和大量 SVG 批量导出时，请注意浏览器内存占用
-
