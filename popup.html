@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVG to PNG</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0b0f17;
+        --panel: #111827;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --border: rgba(255, 255, 255, 0.12);
+        --btn: #2563eb;
+        --btnHover: #1d4ed8;
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f3f4f6;
+          --panel: #ffffff;
+          --text: #111827;
+          --muted: #6b7280;
+          --border: rgba(17, 24, 39, 0.12);
+          --btn: #2563eb;
+          --btnHover: #1d4ed8;
+        }
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 13px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        width: 360px;
+      }
+
+      header {
+        padding: 12px 12px 10px;
+        border-bottom: 1px solid var(--border);
+        background: var(--panel);
+      }
+
+      .appIcon {
+        width: 18px;
+        height: 18px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        display: block;
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        flex: 1;
+      }
+
+      button {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      button.primary {
+        background: var(--btn);
+        border-color: transparent;
+        color: #fff;
+      }
+
+      button.primary:hover {
+        background: var(--btnHover);
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .controls {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      label {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      input,
+      select {
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
+      }
+
+      main {
+        padding: 10px 12px 12px;
+      }
+
+      .status {
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .item {
+        display: grid;
+        grid-template-columns: 64px 1fr;
+        gap: 10px;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--panel);
+      }
+
+      .thumb {
+        width: 64px;
+        height: 64px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.08);
+      }
+
+      .thumb img {
+        max-width: 100%;
+        max-height: 100%;
+        display: block;
+      }
+
+      .meta {
+        display: grid;
+        gap: 6px;
+      }
+
+      .title {
+        font-weight: 600;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .sub {
+        color: var(--muted);
+        font-size: 12px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="row">
+        <img class="appIcon" src="icon.svg" alt="" />
+        <h1>SVG 转 PNG 下载</h1>
+        <button id="downloadAllBtn" class="primary">全部下载</button>
+        <button id="rescanBtn">刷新</button>
+      </div>
+      <div class="controls">
+        <div class="field">
+          <label for="scaleInput">导出倍率</label>
+          <input id="scaleInput" type="number" min="1" max="8" step="1" value="2" />
+        </div>
+        <div class="field">
+          <label for="inlineStyleSelect">样式处理</label>
+          <select id="inlineStyleSelect">
+            <option value="computed">尽量还原（内联计算样式）</option>
+            <option value="raw">原始 SVG（更快）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="bgSelect">背景</label>
+          <select id="bgSelect">
+            <option value="transparent">透明</option>
+            <option value="white">白底</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="visibleOnly">筛选</label>
+          <div class="row">
+            <input id="visibleOnly" type="checkbox" />
+            <label for="visibleOnly">仅可见</label>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div id="status" class="status">准备就绪</div>
+      <div id="list" class="list"></div>
+      <div class="hint">仅用于你有权保存/使用的 SVG 资源；请遵守网站条款与版权法。</div>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

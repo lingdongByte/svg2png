@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "SVG 转 PNG 下载器",
+  "version": "0.1.0",
+  "description": "扫描当前页面内联 SVG，并导出为 PNG 下载（请确保你拥有相应使用权）。",
+  "action": {
+    "default_title": "SVG to PNG",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "scripting", "downloads", "contextMenus"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "serviceWorker.js"
+  }
+}
